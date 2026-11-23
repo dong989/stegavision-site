@@ -73,7 +73,7 @@ button{font:inherit;cursor:pointer}
 .car-track>*{flex:none;padding:0 6px}
 .car-prev,.car-next{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);box-shadow:0 2px 12px rgba(0,0,0,.18);font-size:22px;line-height:1;color:#222;display:flex;align-items:center;justify-content:center}
 .car-prev{left:-10px}.car-next{right:-10px}
-.car-static .car-prev,.car-static .car-next{display:none}
+.car-static .car-prev,.car-static .car-next,.car-marquee .car-prev,.car-marquee .car-next{display:none}
 .app-carousel .car-view{padding:46px 0}
 .app-item{display:block}
 .app-card{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#eee;transform:scale(.84);opacity:.72;transition:transform .7s cubic-bezier(.25,.8,.3,1),opacity .7s,box-shadow .7s}
@@ -234,14 +234,21 @@ button{font:inherit;cursor:pointer}
 .map-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .map-links{margin-top:10px;font-size:14px;color:#575757}
 .map-links a{text-decoration:underline;margin-right:14px}
-.mailbox{align-self:start;margin-top:50px;padding:50px 45px;border-radius:10px;background:#f6f6f8}
-.mailbox h3{font-size:24px;font-weight:700}
-.mailbox p{margin-top:14px;font-size:17px;font-weight:300;line-height:27.2px}
-.mailbox ul{margin-top:22px;font-size:16px;color:#575757;line-height:30px}
-.mailbox li::before{content:"• "}
-.btn-mail{display:inline-flex;align-items:center;justify-content:center;margin-top:30px;height:54px;padding:0 34px;border-radius:9999px;background:#206cd4;color:#fff;font-size:17px;font-weight:600}
+.inquiry{align-self:start;margin-top:49px}
+.inquiry label{display:block;font-size:16px;font-weight:700;line-height:30.4px;margin-bottom:15px}
+.inquiry label em{font-style:normal;color:#206cd4}
+.inquiry input,.inquiry textarea{display:block;width:100%;margin-top:5px;padding:6px 12px;border:1px solid transparent;border-radius:0;background:#f9f9f9;font:inherit;font-weight:400;font-size:16px;color:#222}
+.inquiry input{height:36px}
+.inquiry textarea{resize:vertical;min-height:120px;line-height:1.6}
+.inquiry input:focus,.inquiry textarea:focus{outline:0;border-color:#206cd4;background:#fff}
+.inquiry .bad{border-color:#d93025}
+.form-msg{min-height:22px;font-size:14px;color:#d93025}
+.form-msg.ok{color:#1a7f37}
+.form-actions{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.btn-mail{display:inline-flex;align-items:center;justify-content:center;height:50px;padding:0 44px;border:0;border-radius:9999px;background:#206cd4;color:#fff;font-size:17px;font-weight:600}
 .btn-mail:hover{background:#1a5bb5}
-.mailbox .addr{margin-top:16px;font-size:15px;color:#575757}
+.form-note{margin-top:16px;font-size:14px;color:#757575;line-height:22px}
+.form-note a{text-decoration:underline}
 
 /* 크게 보기 */
 .lightbox{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:30px}
@@ -256,7 +263,7 @@ button{font:inherit;cursor:pointer}
   .news-grid{grid-template-columns:repeat(2,1fr)}
   .eff-grid{grid-template-columns:repeat(2,1fr)}
   .contact-grid{grid-template-columns:1fr}
-  .mailbox{margin-top:0}
+  .inquiry{margin-top:0}
   .technology .diagram{padding:0}
 }
 @media (max-width:767px){
@@ -358,5 +365,4 @@ button{font:inherit;cursor:pointer}
   .contact .note{font-size:15px}
   .contact-list{margin-top:30px}
   .contact-list li{font-size:15px;align-items:flex-start}
-  .mailbox{padding:30px 24px}
 }

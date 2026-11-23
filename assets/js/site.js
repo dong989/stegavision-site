@@ -22,12 +22,15 @@
   }
 
   // 넘어가는 사진 줄 (응용분야, 특허증, 논문)
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function Carousel(el) {
     var view = el.querySelector('.car-view'), track = el.querySelector('.car-track');
     var real = Array.prototype.slice.call(track.children), n = real.length;
     var center = el.hasAttribute('data-center');
     var spec = (el.getAttribute('data-visible') || '4,3,2').split(',').map(Number);
     var auto = Number(el.getAttribute('data-auto') || 0);
+    var marquee = Number(el.getAttribute('data-marquee') || 0); // 사진 한 장이 지나가는 데 걸리는 초
+    var off = 0, raf = null, last = 0, hold = false;
     var idx = 0, w = 0, loop = false, timer = null, busy = false;
     function visible() { var W = window.innerWidth; return W <= 767 ? spec[2] : W <= 1100 ? spec[1] : spec[0]; }
     function build() {
@@ -44,6 +47,8 @@
       } else { idx = 0; }
       Array.prototype.slice.call(track.children).forEach(function (it) { it.style.width = w + 'px'; });
       el.classList.toggle('car-static', !loop);
+      el.classList.toggle('car-marquee', !!marquee && loop);
+      if (marquee && loop) { off = n * w; track.style.transition = 'none'; draw(); return; }
       place(false);
     }
     function place(anim) {
@@ -55,6 +60,16 @@
         Array.prototype.slice.call(track.children).forEach(function (it, i) { it.classList.toggle('is-center', loop ? i % n === k : false); });
       }
     }
+    // 멈추지 않고 일정한 속도로 흘러가는 방식
+    function draw() { track.style.transform = 'translate3d(' + (-off) + 'px,0,0)'; }
+    function tick(t) {
+      if (last && !hold && loop) {
+        off += (w / (marquee * 1000)) * Math.min(t - last, 100);
+        if (off >= 2 * n * w) off -= n * w;
+        draw();
+      }
+      last = t; raf = requestAnimationFrame(tick);
+    }
     function go(d) {
       if (!loop || busy) return;
       busy = true; idx += d; place(true);
@@ -64,8 +79,12 @@
       busy = false;
       if (idx >= 2 * n) { idx -= n; place(false); } else if (idx < n) { idx += n; place(false); }
     });
-    function start() { stop(); if (auto && loop) timer = setInterval(function () { go(1); }, auto); }
-    function stop() { clearInterval(timer); }
+    function start() {
+      stop();
+      if (marquee) { hold = false; if (!raf && !reduce) { last = 0; raf = requestAnimationFrame(tick); } return; }
+      if (auto && loop) timer = setInterval(function () { go(1); }, auto);
+    }
+    function stop() { clearInterval(timer); if (marquee) hold = true; }
     var prev = el.querySelector('.car-prev'), next = el.querySelector('.car-next');
     if (prev) prev.addEventListener('click', function () { go(-1); start(); });
     if (next) next.addEventListener('click', function () { go(1); start(); });
@@ -74,7 +93,9 @@
     view.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; stop(); }, { passive: true });
     view.addEventListener('touchend', function (e) {
       if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
-      if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); start();
+      if (marquee && loop) { off += -dx; while (off < n * w) off += n * w; while (off >= 2 * n * w) off -= n * w; draw(); }
+      else if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+      start();
     });
     var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { busy = false; build(); }, 150); });
     el._rebuild = function () { busy = false; build(); start(); };
@@ -93,6 +114,39 @@
       });
     });
   });
+
+  // 문의하기: 작성한 내용을 메일 작성 창으로 넘긴다
+  var form = document.getElementById('inquiry');
+  if (form) {
+    var msg = document.getElementById('inquiry-msg');
+    var to = (form.querySelector('.form-note a') || {}).textContent || '';
+    var say = function (text, ok) { msg.textContent = text; msg.classList.toggle('ok', !!ok); };
+    var collect = function () {
+      var f = form.elements, bad = null;
+      ['name', 'phone', 'message'].forEach(function (k) {
+        var empty = !f[k].value.trim();
+        f[k].classList.toggle('bad', empty);
+        if (empty && !bad) bad = f[k];
+      });
+      if (bad) { say('성함, 연락처, 내용을 입력해 주세요.'); bad.focus(); return null; }
+      return '회사명: ' + f.company.value.trim() + '\n성함: ' + f.name.value.trim() + '\n연락처: ' + f.phone.value.trim() +
+        '\n이메일: ' + f.email.value.trim() + '\n\n문의 내용:\n' + f.message.value.trim() + '\n';
+    };
+    form.addEventListener('input', function (e) { if (e.target.classList) e.target.classList.remove('bad'); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var body = collect(); if (!body) return;
+      var who = form.elements.company.value.trim() || form.elements.name.value.trim();
+      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('[스테가비전 문의] ' + who) + '&body=' + encodeURIComponent(body);
+      say('메일 작성 창을 열었습니다. 창에서 보내기를 눌러 주세요.', true);
+    });
+    document.getElementById('inquiry-copy').addEventListener('click', function () {
+      var body = collect(); if (!body) return;
+      var done = function () { say('내용을 복사했습니다. ' + to + ' 로 보내 주세요.', true); };
+      var fail = function () { say('복사하지 못했습니다. 내용을 직접 선택해 복사해 주세요.'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(body).then(done, fail); else fail();
+    });
+  }
 
   // 이미지 크게 보기
   var box = document.querySelector('.lightbox');
