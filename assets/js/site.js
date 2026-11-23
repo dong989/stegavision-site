@@ -87,7 +87,8 @@
     var prev = el.querySelector('.car-prev'), next = el.querySelector('.car-next');
     if (prev) prev.addEventListener('click', function () { go(-1); start(); });
     if (next) next.addEventListener('click', function () { go(1); start(); });
-    el.addEventListener('mouseenter', stop); el.addEventListener('mouseleave', start);
+    // 흘러가는 줄은 마우스를 올려도 멈추지 않는다
+    if (!marquee) { el.addEventListener('mouseenter', stop); el.addEventListener('mouseleave', start); }
     var x0 = null;
     view.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; stop(); }, { passive: true });
     view.addEventListener('touchend', function (e) {
