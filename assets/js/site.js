@@ -60,7 +60,8 @@
       }
     }
     // 멈추지 않고 일정한 속도로 흘러가는 방식
-    function draw() { track.style.transform = 'translate3d(' + (-off) + 'px,0,0)'; }
+    // 화면 픽셀 단위로 맞춰 움직여야 작은 글씨가 흔들려 보이지 않는다
+    function draw() { var d = window.devicePixelRatio || 1; track.style.transform = 'translate3d(' + (-Math.round(off * d) / d) + 'px,0,0)'; }
     function tick(t) {
       if (last && !hold && loop) {
         off += (w / (marquee * 1000)) * Math.min(t - last, 100);
