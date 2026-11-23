@@ -5,7 +5,7 @@
 - python3 src/build.py          → 저장소 맨 위에 실제 배포용 파일 생성 (주소: /home, /service ...)
 - python3 src/build.py preview  → 미리보기용 (링크에 .html 을 붙임)
 """
-import sys, pathlib, datetime
+import sys, pathlib, datetime, hashlib
 
 ROOT = pathlib.Path(__file__).parent
 OUT = ROOT.parent  # 저장소 맨 위가 실제 사이트
@@ -50,6 +50,14 @@ ICON_BLOG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M4
 ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'
 
 
+def asset_version():
+    """스타일·스크립트가 바뀌면 방문자 브라우저가 새 파일을 받도록 주소 뒤에 붙이는 값"""
+    h = hashlib.md5()
+    for f in ("assets/css/site.css", "assets/js/site.js"):
+        h.update((OUT / f).read_bytes())
+    return h.hexdigest()[:8]
+
+
 def href(slug):
     return f"{slug}{EXT}"
 
@@ -84,7 +92,7 @@ def render(slug, menu_name, title, desc):
 <link rel="icon" type="image/png" sizes="196x196" href="assets/img/icon-196.png">
 <link rel="apple-touch-icon" sizes="152x152" href="assets/img/icon-152.png">
 <link rel="preload" href="assets/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/site.css?v={asset_version()}">
 </head>
 <body>
 <header class="header">
@@ -110,7 +118,7 @@ def render(slug, menu_name, title, desc):
   </div>
 </footer>
 <div class="lightbox" role="dialog" aria-label="이미지 크게 보기"><button aria-label="닫기">×</button><img alt=""></div>
-<script src="assets/js/site.js"></script>
+<script src="assets/js/site.js?v={asset_version()}"></script>
 </body>
 </html>
 """

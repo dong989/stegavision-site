@@ -22,7 +22,6 @@
   }
 
   // 넘어가는 사진 줄 (응용분야, 특허증, 논문)
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function Carousel(el) {
     var view = el.querySelector('.car-view'), track = el.querySelector('.car-track');
     var real = Array.prototype.slice.call(track.children), n = real.length;
@@ -81,7 +80,7 @@
     });
     function start() {
       stop();
-      if (marquee) { hold = false; if (!raf && !reduce) { last = 0; raf = requestAnimationFrame(tick); } return; }
+      if (marquee) { hold = false; if (!raf) { last = 0; raf = requestAnimationFrame(tick); } return; }
       if (auto && loop) timer = setInterval(function () { go(1); }, auto);
     }
     function stop() { clearInterval(timer); if (marquee) hold = true; }
