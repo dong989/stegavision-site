@@ -12,7 +12,7 @@ OUT = ROOT.parent  # 저장소 맨 위가 실제 사이트
 PREVIEW = len(sys.argv) > 1 and sys.argv[1] == "preview"
 EXT = ".html" if PREVIEW else ""
 # stegavision.com 을 GitHub Pages 에 연결한 뒤 True 로 바꾼다 (CNAME 파일 생성)
-CUSTOM_DOMAIN_LIVE = False
+CUSTOM_DOMAIN_LIVE = True
 
 SITE = {
     "domain": "https://stegavision.com",
