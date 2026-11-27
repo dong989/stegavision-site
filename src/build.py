@@ -57,7 +57,7 @@ PAGES_EN = [
      "Interested in StegaVision's AI-based visual security technology? We welcome inquiries about technical cooperation, partnerships and product authentication solutions."),
 ]
 NEWS_EN = [
-    ("news-yunicorn-esg-2024", "Yeungnam University Startup Support Foundation Holds the 2nd YUnicorn ESG Startup Competition 2024 | StegaVision",
+    ("news-yunicorn-esg-2024", "Grand Prize at the 2nd YUnicorn ESG Startup Competition | StegaVision",
      "StegaVision won the Grand Prize in the pre-founder track at the 2nd YUnicorn ESG Startup Competition 2024."),
     ("privacy", "Privacy Policy | StegaVision", "What personal information the StegaVision website handles and why."),
 ]
