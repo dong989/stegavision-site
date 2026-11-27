@@ -291,6 +291,8 @@ button{font:inherit;cursor:pointer}
   .business .pill{margin-top:28px}
   .business .desc{margin-top:36px;font-size:15px;line-height:24px}
   .diagram{margin-top:28px}
+  .business .diagram{overflow:hidden;width:100vw;margin-left:calc(50% - 50vw)}
+  .business .diagram img{width:155%;max-width:none;margin-left:-30.2%;margin-bottom:-5%}
   .features{grid-template-columns:1fr;gap:16px;margin-top:28px}
   .feature{gap:18px;padding:16px}
   .feature img{width:64px;height:64px}
