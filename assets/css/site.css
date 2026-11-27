@@ -337,7 +337,13 @@ button{font:inherit;cursor:pointer}
   .member ul{margin-top:18px;font-size:14px;line-height:26px}
   .news{padding:60px 0}
   .news .sec-eyebrow{margin-bottom:12px}
-  .news-grid{grid-template-columns:1fr;margin-top:32px}
+  .news-grid{grid-template-columns:1fr;margin-top:32px;gap:12px}
+  .news-card{display:grid;grid-template-columns:34% 1fr;align-items:center}
+  .news-card .thumb{aspect-ratio:4/3;height:100%}
+  .news-card h3{padding:12px 14px 0;font-size:15px;line-height:20px}
+  .news-card p{padding:6px 14px 12px;font-size:12px}
+  .news-card h3,.news-card p{grid-column:2}
+  .news-card .thumb{grid-row:1 / span 2}
   .problem{padding:60px 0 40px}
   .points,.sol-grid,.eff-grid,.hidn-grid{grid-template-columns:1fr;gap:16px;margin-top:28px}
   .point,.sol{padding:26px}
