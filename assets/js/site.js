@@ -122,9 +122,9 @@
     var msg = document.getElementById('inquiry-msg');
     var EN = document.documentElement.lang === 'en';
     var L = EN ? {need: 'Please enter your name, phone number and message.', company: 'Company', name: 'Name', phone: 'Phone', email: 'Email', body: 'Message', subject: '[StegaVision Inquiry] ',
-      opened: 'An email window has opened. Please press Send in that window.', copied: function (to) { return 'Message copied. Please send it to ' + to + '.'; }, failed: 'Could not copy. Please select and copy the message yourself.'}
+      opened: 'An email window has opened. Please press Send in that window.', sending: 'Sending...', sent: 'Your inquiry has been received. We will get back to you soon.', copied: function (to) { return 'Message copied. Please send it to ' + to + '.'; }, failed: 'Could not copy. Please select and copy the message yourself.'}
       : {need: '성함, 연락처, 내용을 입력해 주세요.', company: '회사명', name: '성함', phone: '연락처', email: '이메일', body: '문의 내용', subject: '[스테가비전 문의] ',
-      opened: '메일 작성 창을 열었습니다. 창에서 보내기를 눌러 주세요.', copied: function (to) { return '내용을 복사했습니다. ' + to + ' 로 보내 주세요.'; }, failed: '복사하지 못했습니다. 내용을 직접 선택해 복사해 주세요.'};
+      opened: '메일 작성 창을 열었습니다. 창에서 보내기를 눌러 주세요.', sending: '보내는 중입니다...', sent: '문의가 접수되었습니다. 확인 후 연락드리겠습니다.', copied: function (to) { return '내용을 복사했습니다. ' + to + ' 로 보내 주세요.'; }, failed: '복사하지 못했습니다. 내용을 직접 선택해 복사해 주세요.'};
     var to = (form.querySelector('.form-note a') || {}).textContent || '';
     var say = function (text, ok) { msg.textContent = text; msg.classList.toggle('ok', !!ok); };
     var collect = function () {
@@ -143,8 +143,21 @@
       e.preventDefault();
       var body = collect(); if (!body) return;
       var who = form.elements.company.value.trim() || form.elements.name.value.trim();
-      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(L.subject + who) + '&body=' + encodeURIComponent(body);
-      say(L.opened, true);
+      var mailFallback = function () {
+        window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(L.subject + who) + '&body=' + encodeURIComponent(body);
+        say(L.opened, true);
+      };
+      // 구글 폼으로 바로 접수 (data-gform 이 없거나 전송이 막히면 메일 작성 창으로 대신한다)
+      var gform = form.getAttribute('data-gform');
+      if (!gform || !window.fetch || !window.URLSearchParams) { mailFallback(); return; }
+      var data = new URLSearchParams();
+      (form.getAttribute('data-entries') || '').split(',').forEach(function (pair) {
+        var kv = pair.split(':'); if (form.elements[kv[0]]) data.append('entry.' + kv[1], form.elements[kv[0]].value.trim());
+      });
+      var btn = form.querySelector('.btn-mail'); btn.disabled = true; say(L.sending, true);
+      fetch(gform, {method: 'POST', mode: 'no-cors', body: data}).then(function () {
+        form.reset(); say(L.sent, true);
+      }, mailFallback).then(function () { btn.disabled = false; });
     });
     document.getElementById('inquiry-copy').addEventListener('click', function () {
       var body = collect(); if (!body) return;
