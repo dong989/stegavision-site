@@ -176,6 +176,14 @@
     });
   }
 
+  // 맨 위로 버튼: 화면을 한 장쯤 내려가면 나타난다
+  var topBtn = document.querySelector('.to-top');
+  if (topBtn) {
+    var onScroll = function () { topBtn.classList.toggle('show', window.pageYOffset > 500); };
+    window.addEventListener('scroll', onScroll, {passive: true}); onScroll();
+    topBtn.addEventListener('click', function () { window.scrollTo({top: 0, behavior: 'smooth'}); });
+  }
+
   // 이미지 크게 보기
   var box = document.querySelector('.lightbox');
   if (box) {

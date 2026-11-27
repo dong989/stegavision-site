@@ -42,6 +42,7 @@ PAGES = [
 NEWS = [
     ("news-yunicorn-esg-2024", "영남대 창업지원단, 제2회 2024년 YUnicorn ESG창업경진대회 개최 | 스테가비전",
      "스테가비전이 제2회 2024년 YUnicorn ESG창업경진대회에서 예비창업자 트랙 대상을 받았습니다."),
+    ("privacy", "개인정보처리방침 | 스테가비전", "스테가비전 홈페이지의 개인정보 처리 항목과 이용 목적 안내입니다."),
 ]
 
 # 영문판: 파일, 메뉴 이름, 제목, 설명 (글은 pages/en/ 폴더)
@@ -58,15 +59,18 @@ PAGES_EN = [
 NEWS_EN = [
     ("news-yunicorn-esg-2024", "Yeungnam University Startup Support Foundation Holds the 2nd YUnicorn ESG Startup Competition 2024 | StegaVision",
      "StegaVision won the Grand Prize in the pre-founder track at the 2nd YUnicorn ESG Startup Competition 2024."),
+    ("privacy", "Privacy Policy | StegaVision", "What personal information the StegaVision website handles and why."),
 ]
+# 영문판에서만 바꿔 끼우는 그림 (src/make_en_images.py 로 만든다)
+EN_IMAGES = ["business-diagram.jpg", "technology-flow.jpg", "technology-flow-m.png", "hidn-detect.png"]
 T = {
     "ko": {"lang": "ko", "site": "스테가비전", "logo_alt": "스테가비전 StegaVision", "nav": "주 메뉴", "app": "앱 다운로드", "menu": "메뉴 열기",
            "company": "회사명 : 스테가비전(StegaVision)　대표자 : {ceo}", "addr": "주소 : {address}", "tel": "대표번호 : {phone}", "mail": "이메일",
-           "copy": "개인정보처리방침 ㅣ Copyright ⓒ 스테가비전 All rights reserved.", "zoom": "이미지 크게 보기", "close": "닫기",
+           "privacy": "개인정보처리방침", "copy": "Copyright ⓒ 스테가비전 All rights reserved.", "top": "맨 위로", "zoom": "이미지 크게 보기", "close": "닫기",
            "switch": "EN", "switch_label": "English"},
     "en": {"lang": "en", "site": "StegaVision", "logo_alt": "StegaVision", "nav": "Main menu", "app": "App Download", "menu": "Open menu",
            "company": "Company : StegaVision　CEO : {ceo}", "addr": "Address : {address}", "tel": "Tel : {phone}", "mail": "Email",
-           "copy": "Privacy Policy ㅣ Copyright ⓒ StegaVision All rights reserved.", "zoom": "Enlarged image", "close": "Close",
+           "privacy": "Privacy Policy", "copy": "Copyright ⓒ StegaVision All rights reserved.", "top": "Back to top", "zoom": "Enlarged image", "close": "Close",
            "switch": "KO", "switch_label": "한국어"},
 }
 SITE_EN = {"ceo": "Yujeong Kim", "phone": "+82-10-9936-4030",
@@ -100,7 +104,9 @@ def render(slug, menu_name, title, desc, lang="ko"):
     nav = "".join(
         f'<a href="{href(s)}"{" class=\"on\" aria-current=\"page\"" if s == slug or (s == "about-stegavision" and slug.startswith("news-")) else ""}>{n}</a>'
         for s, n, _, _ in pages)
-    nav += f'<a class="lang" href="{("../" if en else "en/") + href(slug)}" lang="{"ko" if en else "en"}" aria-label="{t["switch_label"]}">{t["switch"]}</a>'
+    ko_href, en_href = ("../" if en else "") + href(slug), ("" if en else "en/") + href(slug)
+    nav += (f'<span class="lang"><a href="{ko_href}" lang="ko" aria-label="한국어"{"" if en else " class=\"on\" aria-current=\"true\""}>KO</a>'
+            f'<a href="{en_href}" lang="en" aria-label="English"{" class=\"on\" aria-current=\"true\"" if en else ""}>EN</a></span>')
     url = f'{SITE["domain"]}/{"en/" if en else ""}{slug}'
     alt_ko, alt_en = f'{SITE["domain"]}/{slug}', f'{SITE["domain"]}/en/{slug}'
     ld = ""
@@ -163,9 +169,10 @@ def render(slug, menu_name, title, desc, lang="ko"):
       <span>{t['company'].format(**site)}</span><br>
       <span>{t['addr'].format(**site)}</span><i>ㅣ</i><span>{t['tel'].format(**site)}</span><i>ㅣ</i><span>{t['mail']} : <a href="mailto:{SITE['email']}">{SITE['email']}</a></span>
     </p>
-    <p class="copy">{t['copy']}</p>
+    <p class="copy"><a href="{href('privacy')}">{t['privacy']}</a> ㅣ {t['copy']}</p>
   </div>
 </footer>
+<button class="to-top" aria-label="{t['top']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></button>
 <div class="lightbox" role="dialog" aria-label="{t['zoom']}"><button aria-label="{t['close']}">×</button><img alt=""></div>
 <script src="assets/js/site.js?v={asset_version()}"></script>
 </body>
@@ -174,6 +181,8 @@ def render(slug, menu_name, title, desc, lang="ko"):
     for k, v in site.items():
         html = html.replace("{{" + k + "}}", v)
     if en:  # 영문판은 en/ 폴더에 있으므로 공통 자산 경로를 한 단계 위로
+        for n in EN_IMAGES:
+            html = html.replace(f'assets/img/{n}', f'assets/img/en/{n}')
         html = html.replace('"assets/', '"../assets/').replace("url('assets/", "url('../assets/")
     html = html.replace("{{arrow}}", ICON_ARROW)
     for s in [x[0] for x in PAGES] + [x[0] for x in NEWS]:
