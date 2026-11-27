@@ -120,6 +120,11 @@
   var form = document.getElementById('inquiry');
   if (form) {
     var msg = document.getElementById('inquiry-msg');
+    var EN = document.documentElement.lang === 'en';
+    var L = EN ? {need: 'Please enter your name, phone number and message.', company: 'Company', name: 'Name', phone: 'Phone', email: 'Email', body: 'Message', subject: '[StegaVision Inquiry] ',
+      opened: 'An email window has opened. Please press Send in that window.', copied: function (to) { return 'Message copied. Please send it to ' + to + '.'; }, failed: 'Could not copy. Please select and copy the message yourself.'}
+      : {need: '성함, 연락처, 내용을 입력해 주세요.', company: '회사명', name: '성함', phone: '연락처', email: '이메일', body: '문의 내용', subject: '[스테가비전 문의] ',
+      opened: '메일 작성 창을 열었습니다. 창에서 보내기를 눌러 주세요.', copied: function (to) { return '내용을 복사했습니다. ' + to + ' 로 보내 주세요.'; }, failed: '복사하지 못했습니다. 내용을 직접 선택해 복사해 주세요.'};
     var to = (form.querySelector('.form-note a') || {}).textContent || '';
     var say = function (text, ok) { msg.textContent = text; msg.classList.toggle('ok', !!ok); };
     var collect = function () {
@@ -129,23 +134,45 @@
         f[k].classList.toggle('bad', empty);
         if (empty && !bad) bad = f[k];
       });
-      if (bad) { say('성함, 연락처, 내용을 입력해 주세요.'); bad.focus(); return null; }
-      return '회사명: ' + f.company.value.trim() + '\n성함: ' + f.name.value.trim() + '\n연락처: ' + f.phone.value.trim() +
-        '\n이메일: ' + f.email.value.trim() + '\n\n문의 내용:\n' + f.message.value.trim() + '\n';
+      if (bad) { say(L.need); bad.focus(); return null; }
+      return L.company + ': ' + f.company.value.trim() + '\n' + L.name + ': ' + f.name.value.trim() + '\n' + L.phone + ': ' + f.phone.value.trim() +
+        '\n' + L.email + ': ' + f.email.value.trim() + '\n\n' + L.body + ':\n' + f.message.value.trim() + '\n';
     };
     form.addEventListener('input', function (e) { if (e.target.classList) e.target.classList.remove('bad'); });
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var body = collect(); if (!body) return;
       var who = form.elements.company.value.trim() || form.elements.name.value.trim();
-      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('[스테가비전 문의] ' + who) + '&body=' + encodeURIComponent(body);
-      say('메일 작성 창을 열었습니다. 창에서 보내기를 눌러 주세요.', true);
+      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(L.subject + who) + '&body=' + encodeURIComponent(body);
+      say(L.opened, true);
     });
     document.getElementById('inquiry-copy').addEventListener('click', function () {
       var body = collect(); if (!body) return;
-      var done = function () { say('내용을 복사했습니다. ' + to + ' 로 보내 주세요.', true); };
-      var fail = function () { say('복사하지 못했습니다. 내용을 직접 선택해 복사해 주세요.'); };
+      var done = function () { say(L.copied(to), true); };
+      var fail = function () { say(L.failed); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(body).then(done, fail); else fail();
+    });
+  }
+
+  // 스크롤 등장 효과: 화면에 들어오는 순간 아래에서 살짝 떠오른다 (움직임 줄이기 설정이면 끔)
+  if ('IntersectionObserver' in window && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    var targets = document.querySelectorAll('.sec-title,.sec-eyebrow,.sec-sub,.pill,.business .desc,.lead,.diagram,.feature,.point,.sol,.eff,.hidn-logo,.hidn-card,.msg p,.t-year,.member,.news-card,.c-card,.stats,.contact-grid > *,.article .wrap > *');
+    var vh = window.innerHeight;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target; io.unobserve(el);
+        // 같은 줄에 나란히 있는 카드는 차례로 나타나게 약간씩 늦춘다
+        var sibs = el.parentNode ? Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }) : [];
+        var i = Math.max(0, sibs.indexOf(el));
+        el.style.transitionDelay = Math.min(i, 4) * 90 + 'ms';
+        el.classList.add('rv-in');
+        setTimeout(function () { el.classList.remove('rv', 'rv-in'); el.style.transitionDelay = ''; }, 900 + Math.min(i, 4) * 90);
+      });
+    }, {rootMargin: '0px 0px -8% 0px', threshold: 0.05});
+    Array.prototype.forEach.call(targets, function (el) {
+      if (el.getBoundingClientRect().top < vh * 0.9) return;   // 처음부터 보이는 것은 그대로 둔다
+      el.classList.add('rv'); io.observe(el);
     });
   }
 

@@ -19,6 +19,10 @@ button{font:inherit;cursor:pointer}
 .nav a{font-size:18px;color:#424242;white-space:nowrap}
 .nav a.on{font-weight:700;color:#000}
 .nav a:hover{color:#000}
+.nav a.lang{font-size:13px;font-weight:600;letter-spacing:.5px;color:#206cd4;border:1px solid #c9dcf5;border-radius:999px;padding:5px 12px;align-self:center}
+.nav a.lang:hover{background:#206cd4;color:#fff;border-color:#206cd4}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.rv-in{opacity:1;transform:none}
 .btn-app{display:inline-flex;align-items:center;gap:6px;height:41px;padding:0 20px;border:1px solid #d3d3d3;border-radius:9999px;background:#fff;font-size:16px;color:#000;cursor:default}
 .btn-app svg{width:16px;height:16px}
 .menu-btn{display:none;width:40px;height:40px;border:0;background:none;padding:8px}
@@ -276,6 +280,7 @@ button{font:inherit;cursor:pointer}
   .nav{position:fixed;left:0;right:0;top:60px;transform:none;flex-direction:column;gap:0;background:#fff;border-top:1px solid #eee;box-shadow:0 10px 20px rgba(0,0,0,.08);display:none}
   .nav.open{display:flex}
   .nav a{padding:16px 20px;border-bottom:1px solid #f2f2f2;font-size:17px}
+  .nav a.lang{align-self:flex-start;margin:14px 20px;padding:6px 14px;border-bottom:1px solid #c9dcf5;font-size:13px}
   .sec-title{font-size:30px}
   .sec-title.md{font-size:28px}
   .sec-eyebrow{font-size:13px;letter-spacing:4px;margin-bottom:12px}
@@ -337,8 +342,8 @@ button{font:inherit;cursor:pointer}
   .member ul{margin-top:18px;font-size:14px;line-height:26px}
   .news{padding:60px 0}
   .news .sec-eyebrow{margin-bottom:12px}
-  .news-grid{grid-template-columns:1fr;margin-top:32px;gap:12px}
-  .news-card{display:grid;grid-template-columns:34% 1fr;align-items:center}
+  .news-grid{grid-template-columns:minmax(0,1fr);margin-top:32px;gap:12px}
+  .news-card{display:grid;grid-template-columns:34% minmax(0,1fr);align-items:center}
   .news-card .thumb{aspect-ratio:4/3;height:100%}
   .news-card h3{padding:12px 14px 0;font-size:15px;line-height:20px}
   .news-card p{padding:6px 14px 12px;font-size:12px}
